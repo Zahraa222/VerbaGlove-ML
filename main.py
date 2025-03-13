@@ -60,6 +60,8 @@ Ring = float(input("Enter Ring Value: "))
 Pinky =float(input("Enter Pinky Value: "))
 sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky]])
 
+# Create a DataFrame with the same column names as the training data
+sensor_values = pd.DataFrame([[Thumb, Index, Middle, Ring, Pinky]], columns=X.columns)
 
 # Standardize the input values (same scaling as training data)
 sensor_values_scaled = scaler.transform(sensor_values)
