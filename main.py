@@ -52,3 +52,20 @@ plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix for SVM ASL Gesture Recognition")
 plt.show()
+
+Thumb = float(input("Enter Thumb Value: "))
+Index =float(input("Enter Index Value: "))
+Middle = float(input("Enter Middle Value: "))
+Ring = float(input("Enter Ring Value: "))
+Pinky =float(input("Enter Pinky Value: "))
+sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky]])
+
+
+# Standardize the input values (same scaling as training data)
+sensor_values_scaled = scaler.transform(sensor_values)
+
+# Predict ASL gesture
+predicted_class = svm_model.predict(sensor_values_scaled)[0]
+predicted_letter = label_encoder.inverse_transform([predicted_class])[0]
+
+print(f"Predicted Gesture: {predicted_letter}")
