@@ -40,6 +40,18 @@ print(f"Model Accuracy: {accuracy * 100:.2f}%\n")
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
 
+# Extract SVM model parameters
+support_vectors = svm_model.support_vectors_  # Support vectors
+dual_coef = svm_model.dual_coef_  # Dual coefficients
+intercept = svm_model.intercept_  # Bias term
+
+# Save parameters to files for ESP32 deployment
+np.savetxt("support_vectors.csv", support_vectors, delimiter=",")
+np.savetxt("dual_coef.csv", dual_coef, delimiter=",")
+np.savetxt("intercept.csv", intercept, delimiter=",")
+
+print("Model parameters saved! Use these files for ESP32 integration.")
+
 while(1):
     Thumb = float(input("Enter Thumb Value: "))
     Index =float(input("Enter Index Value: "))
