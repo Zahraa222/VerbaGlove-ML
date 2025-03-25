@@ -5,12 +5,11 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 
 # Load dataset
-file_path = "Training_Data.csv"
+file_path = "Full_Dataset.csv"
 df = pd.read_csv(file_path)
-
 # Encode ASL letters as numeric labels
 label_encoder = LabelEncoder()
 df["Letter"] = label_encoder.fit_transform(df["Letter"])  # Converts 'A', 'B'... to 0, 1...
@@ -41,33 +40,22 @@ print(f"Model Accuracy: {accuracy * 100:.2f}%\n")
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
 
-# Confusion Matrix
-conf_matrix = confusion_matrix(y_test, y_pred)
+while(1):
+    Thumb = float(input("Enter Thumb Value: "))
+    Index =float(input("Enter Index Value: "))
+    Middle = float(input("Enter Middle Value: "))
+    Ring = float(input("Enter Ring Value: "))
+    Pinky =float(input("Enter Pinky Value: "))
+    sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky]])
 
-# Plot Confusion Matrix
-plt.figure(figsize=(10, 6))
-sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues",
-            xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.title("Confusion Matrix for SVM ASL Gesture Recognition")
-plt.show()
+    # Create a DataFrame with the same column names as the training data
+    sensor_values = pd.DataFrame([[Thumb, Index, Middle, Ring, Pinky]], columns=X.columns)
 
-Thumb = float(input("Enter Thumb Value: "))
-Index =float(input("Enter Index Value: "))
-Middle = float(input("Enter Middle Value: "))
-Ring = float(input("Enter Ring Value: "))
-Pinky =float(input("Enter Pinky Value: "))
-sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky]])
+    # Standardize the input values (same scaling as training data)
+    sensor_values_scaled = scaler.transform(sensor_values)
 
-# Create a DataFrame with the same column names as the training data
-sensor_values = pd.DataFrame([[Thumb, Index, Middle, Ring, Pinky]], columns=X.columns)
+    # Predict ASL gesture
+    predicted_class = svm_model.predict(sensor_values_scaled)[0]
+    predicted_letter = label_encoder.inverse_transform([predicted_class])[0]
 
-# Standardize the input values (same scaling as training data)
-sensor_values_scaled = scaler.transform(sensor_values)
-
-# Predict ASL gesture
-predicted_class = svm_model.predict(sensor_values_scaled)[0]
-predicted_letter = label_encoder.inverse_transform([predicted_class])[0]
-
-print(f"Predicted Gesture: {predicted_letter}")
+    print(f"Predicted Gesture: {predicted_letter}")
