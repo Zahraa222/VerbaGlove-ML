@@ -1,15 +1,15 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
 # Load dataset
 file_path = "Full_Dataset.csv"
 df = pd.read_csv(file_path)
+
 # Encode ASL letters as numeric labels
 label_encoder = LabelEncoder()
 df["Letter"] = label_encoder.fit_transform(df["Letter"])  # Converts 'A', 'B'... to 0, 1...
@@ -26,8 +26,8 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Train SVM model
-svm_model = SVC(kernel="rbf", C=1, gamma="scale")
+# Train ONE-VS-REST SVM model
+svm_model = OneVsRestClassifier(SVC(kernel="rbf", C=1, gamma="scale"))
 svm_model.fit(X_train_scaled, y_train)
 
 # Make predictions
@@ -40,19 +40,29 @@ print(f"Model Accuracy: {accuracy * 100:.2f}%\n")
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
 
-# Extract SVM model parameters
-support_vectors = svm_model.support_vectors_  # Support vectors
-dual_coef = svm_model.dual_coef_  # Dual coefficients
-intercept = svm_model.intercept_  # Bias term
+#Save Scaler
+np.savetxt("scaler_mean.csv", scaler.mean_, delimiter=",")
+np.savetxt("scaler_std.csv", scaler.scale_, delimiter=",")
 
-# Save parameters to files for ESP32 deployment
-np.savetxt("support_vectors.csv", support_vectors, delimiter=",")
-np.savetxt("dual_coef.csv", dual_coef, delimiter=",")
-np.savetxt("intercept.csv", intercept, delimiter=",")
+#Export and extract each model
+for i, estimator in enumerate(svm_model.estimators_):
+    np.savetxt(f"support_vectors_{i}.csv", estimator.support_vectors_, delimiter=",")
+    np.savetxt(f"dual_coef_{i}.csv", estimator.dual_coef_, delimiter=",")
+    np.savetxt(f"intercept_{i}.csv", estimator.intercept_, delimiter=",")
 
-print("Model parameters saved! Use these files for ESP32 integration.")
+#Save label mapping
+#We converted the ASL letters to numeric labels using LabelEncoder
+#We need to save this mapping to a file so we can use it later to convert the predicted numeric labels back to ASL letters
+labels = list(label_encoder.classes_)
+print("Class labels:", labels)
 
-while(1):
+with open("label_mapping.txt", "w") as f:
+    for idx, label in enumerate(labels):
+        f.write(f"{idx}: {label}\n")
+
+
+
+while 1:
     Thumb = float(input("Enter Thumb Value: "))
     Index =float(input("Enter Index Value: "))
     Middle = float(input("Enter Middle Value: "))
