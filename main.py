@@ -7,7 +7,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
 # Load dataset
-file_path = "Full_Dataset.csv"
+file_path = "Full_Dataset_cleaned_fixed.csv"
 df = pd.read_csv(file_path)
 
 # Encode ASL letters as numeric labels
@@ -39,6 +39,10 @@ print(f"Model Accuracy: {accuracy * 100:.2f}%\n")
 
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
+
+for i, estimator in enumerate(svm_model.estimators_):
+    print(f"Model {i} gamma:", estimator._gamma)
+
 
 #Save Scaler
 np.savetxt("scaler_mean.csv", scaler.mean_, delimiter=",")
