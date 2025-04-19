@@ -4,10 +4,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Load dataset
-file_path = "Full_Dataset_cleaned_fixed.csv"
+file_path = "ASL_Dataset.csv"
 df = pd.read_csv(file_path)
 
 # Encode ASL letters as numeric labels
@@ -40,8 +42,23 @@ print(f"Model Accuracy: {accuracy * 100:.2f}%\n")
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
 
+# Print confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(conf_matrix)
+
 for i, estimator in enumerate(svm_model.estimators_):
     print(f"Model {i} gamma:", estimator._gamma)
+    
+# Optionally, visualize the confusion matrix using seaborn
+plt.figure(figsize=(10, 7))
+sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
+plt.xlabel("Predicted Labels")
+plt.ylabel("True Labels")
+plt.title("Confusion Matrix")
+plt.show()
+
+
 
 
 #Save Scaler
@@ -72,10 +89,13 @@ while 1:
     Middle = float(input("Enter Middle Value: "))
     Ring = float(input("Enter Ring Value: "))
     Pinky =float(input("Enter Pinky Value: "))
-    sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky]])
+    indexTouch = float(input("Enter Index Touch Value: "))
+    middleTouch = float(input("Enter Middle Touch Value: "))
+    thumbTouch = float(input("Enter Thumb Touch Value: "))
+    sensor_values = np.array([[Thumb, Index, Middle, Ring, Pinky, indexTouch, middleTouch, thumbTouch]])
 
     # Create a DataFrame with the same column names as the training data
-    sensor_values = pd.DataFrame([[Thumb, Index, Middle, Ring, Pinky]], columns=X.columns)
+    sensor_values = pd.DataFrame([[Thumb, Index, Middle, Ring, Pinky, indexTouch, middleTouch, thumbTouch]], columns=X.columns)
 
     # Standardize the input values (same scaling as training data)
     sensor_values_scaled = scaler.transform(sensor_values)
